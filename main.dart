@@ -218,10 +218,49 @@ class Habit extends StatefulWidget {
   @override
   _HabitState createState() => _HabitState();
 }
-
 class _HabitState extends State<Habit> {
   final List<String> _daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   final List<bool> _selectedDays = List.filled(7, false);
+
+  void _showDayDialog(int dayIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(_daysOfWeek[dayIndex]),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedDays[dayIndex] = true;
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: Text('Complete'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.green,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedDays[dayIndex] = false;
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: Text('Fail'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,16 +299,25 @@ class _HabitState extends State<Habit> {
                 .asMap()
                 .entries
                 .map(
-                  (entry) => FilterChip(
-                    label: Text(entry.value),
-                    selected: _selectedDays[entry.key],
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedDays[entry.key] = selected;
-                      });
-                    },
+                  (entry) => InkWell(
+                onTap: () {
+                  _showDayDialog(entry.key);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: _selectedDays[entry.key]
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                )
+                  child: Text(entry.value),
+                ),
+              ),
+            )
                 .toList(),
           ),
         ],
